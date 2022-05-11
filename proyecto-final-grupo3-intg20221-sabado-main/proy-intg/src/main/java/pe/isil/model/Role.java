@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Data
 public class Role {
     @Id
-    @GeneratedValue( strategy= GenerationType.AUTO )
+    @GeneratedValue( strategy= GenerationType.IDENTITY )
     private Integer idrol;
     private String nombre;
     private String descripcion;

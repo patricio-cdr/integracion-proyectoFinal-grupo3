@@ -6,5 +6,5 @@ import pe.isil.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    boolean findByEmailAndClave(String email, String clave);
+    boolean findByEmailAndPassword(String email, String password);
 }
