@@ -47,7 +47,7 @@ public class UserResource {
 
         return userService.readById(idusuario)
                 .map(currentUser -> {
-                    user.setIdusuario(idusuario);
+                    user.setIdUsuario(idusuario);
                     userService.update(currentUser);
                     return new ResponseEntity<>(user, HttpStatus.OK);
                 })

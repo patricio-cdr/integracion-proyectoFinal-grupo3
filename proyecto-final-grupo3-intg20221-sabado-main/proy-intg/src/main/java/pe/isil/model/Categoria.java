@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Table(name ="categoria")
 @NoArgsConstructor
@@ -13,4 +12,11 @@ import javax.persistence.Table;
 @Entity
 @Data
 public class Categoria {
+    @Id
+    @GeneratedValue( strategy= GenerationType.AUTO )
+    private Integer idCategoria;
+    private String nombre;
+    private String descripcion;
+    private Integer estado;
+
 }

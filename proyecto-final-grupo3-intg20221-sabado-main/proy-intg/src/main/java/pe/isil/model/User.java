@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue( strategy= GenerationType.AUTO )
-    private Integer idusuario;
+    private Integer idUsuario;
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "idrol")
     private Role role;
