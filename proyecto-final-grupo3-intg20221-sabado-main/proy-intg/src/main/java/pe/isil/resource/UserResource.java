@@ -66,9 +66,9 @@ public class UserResource {
                 .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping("/users/{email}{clave}")
+    @GetMapping("/users/{email},{clave}")
     public boolean findByEmailAndClave(@PathVariable String email,
                                        @PathVariable String clave){
-        return userService.findByEmailAndClave(email,clave);
+        return userService.findByEmailAndPassword(email,clave);
     }
 }
