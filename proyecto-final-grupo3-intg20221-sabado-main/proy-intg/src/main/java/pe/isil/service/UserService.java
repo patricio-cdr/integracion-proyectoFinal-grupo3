@@ -43,7 +43,7 @@ public class UserService implements BaseService<User, Integer> {
         return userRepository.findById(s);
     }
 
-    public boolean findByEmailAndPassword(String email, String clave){
-        return userRepository.findByEmailAndPassword(email,clave);
+    public boolean findByEmailAndClave(String email, String clave){
+        return userRepository.findByEmailAndClave(email,clave);
     }
 }

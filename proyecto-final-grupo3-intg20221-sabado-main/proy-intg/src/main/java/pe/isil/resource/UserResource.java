@@ -69,6 +69,6 @@ public class UserResource {
     @GetMapping("/users/{email},{clave}")
     public boolean findByEmailAndClave(@PathVariable String email,
                                        @PathVariable String clave){
-        return userService.findByEmailAndPassword(email,clave);
+        return userService.findByEmailAndClave(email,clave);
     }
 }
