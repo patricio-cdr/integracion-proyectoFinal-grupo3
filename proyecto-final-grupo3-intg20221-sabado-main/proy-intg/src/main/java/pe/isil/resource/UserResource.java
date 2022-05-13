@@ -60,7 +60,7 @@ public class UserResource {
         return userService.readById(idusuario)
                 .map(currentUser -> {
                     user.setIdusuario(idusuario);
-                    userService.update(currentUser);
+                    userService.update(user);
                     return new ResponseEntity<>(user, HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));

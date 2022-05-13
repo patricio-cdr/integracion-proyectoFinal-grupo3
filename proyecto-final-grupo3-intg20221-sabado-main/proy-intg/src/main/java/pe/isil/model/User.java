@@ -6,17 +6,17 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Table(name = "usuario", uniqueConstraints = { @UniqueConstraint(columnNames = {"email", "clave", "num_documento"}) })
+@Table(name = "usuario", uniqueConstraints = { @UniqueConstraint(columnNames = {"email", "password", "num_documento"}) })
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Data
 public class User {
     @Id
-    @GeneratedValue( strategy= GenerationType.AUTO )
-    private Integer idUsuario;
-    @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "idrol")
+    @GeneratedValue( strategy= GenerationType.IDENTITY )
+    private Integer idusuario;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idrol")
     private Role role;
     private String nombre;
     private String tipo_documento;
@@ -26,7 +26,7 @@ public class User {
     private String telefono;
     @Column(name = "email")
     private String email;
-    @Column(name = "clave")
-    private String clave;
+    @Column(name = "password")
+    private String password;
     private Integer estado;
 }
