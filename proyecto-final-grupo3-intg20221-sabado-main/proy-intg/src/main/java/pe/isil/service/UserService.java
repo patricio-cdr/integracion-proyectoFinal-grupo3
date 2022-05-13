@@ -1,25 +1,33 @@
 package pe.isil.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pe.isil.model.User;
 import pe.isil.repository.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
+import javax.transaction.Transactional;
+import java.util.*;
 
 @Service
-public class UserService implements BaseService<User, Integer> {
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class UserService implements BaseService<User, Integer>, UserDetailsService {
 
     @Autowired
     UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void create(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -43,7 +51,18 @@ public class UserService implements BaseService<User, Integer> {
         return userRepository.findById(s);
     }
 
-    public boolean findByEmailAndPassword(String email, String clave){
-        return userRepository.findByEmailAndPassword(email,clave);
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found in the database");
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().getNombre()));
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }

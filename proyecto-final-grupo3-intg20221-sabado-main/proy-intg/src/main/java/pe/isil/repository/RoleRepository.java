@@ -6,4 +6,5 @@ import pe.isil.model.Role;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
+    Role findByNombre(String nombre);
 }

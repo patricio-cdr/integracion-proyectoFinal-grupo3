@@ -1,22 +1,34 @@
 package pe.isil.resource;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pe.isil.model.User;
 import pe.isil.service.UserService;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/api")
 @RestController
+@RequiredArgsConstructor
 public class UserResource {
-
     private final UserService userService;
-
-    public UserResource(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers(){
@@ -66,9 +78,38 @@ public class UserResource {
                 .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping("/users/{email},{clave}")
-    public boolean findByEmailAndClave(@PathVariable String email,
-                                       @PathVariable String clave){
-        return userService.findByEmailAndPassword(email,clave);
+    @GetMapping("/token/refresh")
+    public void refreshToken(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        String authorizationHeader = res.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String refresh_token = authorizationHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(refresh_token);
+                String username = decodedJWT.getSubject();
+                User user = userService.findByEmail(username);
+                String access_token = JWT.create()
+                        .withSubject(user.getEmail())
+                        .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                        .withIssuer(req.getRequestURI().toString())
+                        .withClaim("roles", new ArrayList<>(Arrays.asList(user.getRole().getNombre())))
+                        .sign(algorithm);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", access_token);
+                tokens.put("refresh_token", refresh_token);
+                res.setContentType("application/json");
+                new ObjectMapper().writeValue(res.getOutputStream(), tokens);
+            } catch (Exception exception) {
+                res.setHeader("error ", exception.getMessage());
+                res.setStatus(403);
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", exception.getMessage());
+                res.setContentType("application/json");
+                new ObjectMapper().writeValue(res.getOutputStream(), error);
+            }
+        }else {
+            throw new RuntimeException("Refresh token is missing");
+        }
     }
 }
