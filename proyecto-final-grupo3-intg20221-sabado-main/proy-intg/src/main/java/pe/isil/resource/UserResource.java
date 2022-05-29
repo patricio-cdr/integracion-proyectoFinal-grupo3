@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api")
 @RestController
@@ -45,6 +44,12 @@ public class UserResource {
         return userService.readById(idusuario)
                 .map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    }
+
+    @GetMapping("/users/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email){
+
+        return new ResponseEntity<>(userService.findByEmail(email), HttpStatus.OK);
     }
 
     @PostMapping("/users")

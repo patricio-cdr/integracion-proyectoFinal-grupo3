@@ -38,6 +38,7 @@ public class UserService implements BaseService<User, Integer>, UserDetailsServi
 
     @Override
     public void update(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 

@@ -1,5 +1,6 @@
 package pe.isil.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,11 @@ public class User {
     @Id
     @GeneratedValue( strategy= GenerationType.IDENTITY )
     private Integer idusuario;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "idrol")
+    @Column(name = "idrol")
+    private Integer idrol;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JoinColumn(name = "idrol", insertable = false, updatable = false)
     private Role role;
     private String nombre;
     private String tipo_documento;
